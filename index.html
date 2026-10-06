@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FLUX Image Generator</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
+    input { width: 70%; padding: 10px; font-size: 16px; }
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    #out { max-width: 100%; margin-top: 20px; border-radius: 8px; }
+    #msg { color: #666; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>توليد صور بالذكاء الاصطناعي (FLUX Schnell)</h2>
+  <input id="p" placeholder="Describe your image" />
+  <button onclick="gen()">توليد</button>
+  <p id="msg"></p>
+  <img id="out" style="max-width:100%" />
+
+  <script>
+    const WORKER_URL = "https://image-gen.profuse-troodon.workers.dev";
+
+    async function gen() {
+      const msg = document.getElementById("msg");
+      msg.textContent = "جاري التوليد...";
+      const r = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: document.getElementById("p").value }),
+      });
+      const data = await r.json();
+      if (data.error) { msg.textContent = data.error; return; }
+      msg.textContent = "";
+      document.getElementById("out").src = "data:image/jpeg;base64," + data.image;
+    }
+  </script>
+</body>
+</html>
